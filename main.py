@@ -15,10 +15,14 @@ class Player(pygame.sprite.Sprite):
         self.height = len(shape) * pixel_size
 
         self.surface = pygame.Surface((self.width, self.height))
+        self.surface.set_colorkey([0,0,0])
 
         self.rect = self.surface.get_rect(top=y, left=x)
 
         self.crouching = False
+        self.crouching_first = False
+
+        self.point_left = True
 
     def update(self, screen):
         self.move()
@@ -32,11 +36,23 @@ class Player(pygame.sprite.Sprite):
 
         if player.crouching:
             player.rect.height = player.height / 2
+            if not player.crouching_first:
+                player.crouching_first = True
+                player.rect.y += player.height / 2
             scaled_screen = pygame.transform.scale(player.surface, (player.width, (player.height / 2)))
+            if not player.point_left:
+                scaled_screen = pygame.transform.flip(scaled_screen, True, False)
             screen.blit(scaled_screen, (player.rect.x, player.rect.y))
         else:
+            if not player.crouching and player.crouching_first:
+                player.crouching_first = False
+                player.rect.y -= player.height / 2
+            player.crouching_first = False
             player.rect.height = player.height
-            screen.blit(self.surface, player.rect)
+            if not player.point_left:
+                screen.blit(pygame.transform.flip(self.surface, True, False), player.rect)
+            else:
+                screen.blit(self.surface, player.rect)
 
     def move(self):
         """
@@ -94,13 +110,18 @@ pygame.display.set_caption("Platformer")
 done = False
 clock = pygame.time.Clock()
 
-pixel_size = 10
+pixel_size = 5
 player_shape = [
-    ["T","T","T","T","T",],
-    ["T","B","T","B","T",],
-    ["T","T","T","T","T",],
-    ["T","R","R","R","T",],
-    ["T","T","T","T","T",],
+    [" "," "," ","W","W","W","W"," "," "," "],
+    [" "," ","O","O","W","B","W","W"," "," "],
+    [" ","O","O","O","W","W","W","W"," "," "],
+    [" "," "," ","W","W","W","W"," "," "," "],
+    [" "," "," ","W","W","W","W"," ","W"," "],
+    [" "," ","W","W","W","W","W","W","W"," "],
+    [" ","W","W","W","W","W","W","W"," "," "],
+    [" ","W"," ","W","W","W","W"," "," "," "],
+    [" "," "," ","O"," "," ","O"," "," "," "],
+    [" "," ","O","O"," ","O","O"," "," "," "],
 ]
 
 player = Player(300, 100, player_shape, pixel_size)
@@ -162,13 +183,15 @@ while not done:
         quack_ticker = 0
 
     if pressed[pygame.K_a]:
+        player.point_left = True
         if crouching:
-            player.velocity.x -= 0.025
+            player.rect.x -= 0.005
         else:
             player.velocity.x -= 0.1
     if pressed[pygame.K_d]:
+        player.point_left = False
         if crouching:
-            player.velocity.x += 0.025
+            player.rect.x += 0.005
         else:
             player.velocity.x += 0.1
 
@@ -188,7 +211,7 @@ while not done:
     player.rect = player.rect.move(player.velocity.x * (clock.get_time() / 10), player.velocity.y * (clock.get_time() / 10))
 
     # --- Screen-clearing code goes here
-    screen.fill(utils.colors["White"])
+    screen.fill(utils.colors["Quarter_Gray"])
 
     # --- Drawing code should go here
 
