@@ -1,17 +1,19 @@
 import pygame
 import utils
 import collision_utils as cutils
+from player_sprites import player_default
+
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, shape, pixel_size):
+    def __init__(self, x, y, pixel_size):
         super(Player, self).__init__()
         self.velocity = pygame.math.Vector2(0, 0)
 
-        self.shape = shape
+        self.shape = player_default
         self.pixel_size = pixel_size
 
-        self.width = len(shape[0]) * pixel_size
-        self.height = len(shape) * pixel_size
+        self.width = len(self.shape[0]) * pixel_size
+        self.height = len(self.shape) * pixel_size
 
         self.surface = pygame.Surface((self.width, self.height))
         self.surface.set_colorkey([0,0,0])
@@ -98,7 +100,7 @@ class Player(pygame.sprite.Sprite):
             self.velocity.x *= 0.99
 
         if not self.onGround:
-            if pressed[pygame.K_SPACE] and self.velocity.y > 0:
+            if pressed[pygame.K_SPACE] and self.velocity.y > 0 and not self.crouching:
                 self.velocity.y += 0.05
             else:
                 self.velocity.y += 0.2

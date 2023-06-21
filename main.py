@@ -1,6 +1,6 @@
 import pygame
+
 import utils
-import collision_utils as cutils
 from player import Player
 
 class BoundaryFactory:
@@ -38,20 +38,8 @@ done = False
 clock = pygame.time.Clock()
 
 pixel_size = 5
-player_shape = [
-    [" "," "," ","W","W","W","W"," "," "," "],
-    [" "," ","O","O","W","B","W","W"," "," "],
-    [" ","O","O","O","W","W","W","W"," "," "],
-    [" "," "," ","W","W","W","W"," "," "," "],
-    [" "," "," ","W","W","W","W"," ","W"," "],
-    [" "," ","W","W","W","W","W","W","W"," "],
-    [" ","W","W","W","W","W","W","W"," "," "],
-    [" ","W"," ","W","W","W","W"," "," "," "],
-    [" "," "," ","O"," "," ","O"," "," "," "],
-    [" "," ","O","O"," ","O","O"," "," "," "],
-]
 
-player = Player(300, 100, player_shape, pixel_size)
+player = Player(300, 100, pixel_size)
 
 factory = BoundaryFactory()
 
