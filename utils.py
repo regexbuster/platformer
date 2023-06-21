@@ -1,7 +1,7 @@
 import pygame
 
 colors = {
-    "Black": pygame.Color(0, 0, 0),
+    "Black": pygame.Color(1, 1, 1),
     "Dark_Red": pygame.Color(128, 0, 0),
     "Red": pygame.Color(255, 0, 0),
     "Pink": pygame.Color(255, 0, 255),
@@ -16,7 +16,8 @@ colors = {
     "Half_Gray": pygame.Color(128, 128, 128),
     "Dark_Yellow": pygame.Color(128, 128, 0),
     "Yellow": pygame.Color(255, 255, 0),
-    "White": pygame.Color(255, 255, 255)
+    "White": pygame.Color(255, 255, 255),
+    "Orange": pygame.Color(255, 165, 0)
 }
 
 
@@ -42,6 +43,8 @@ def letter_to_color(letter):
         return colors["Yellow"]
     if letter == "W":
         return colors["White"]
+    if letter == "O":
+        return colors["Orange"]
 
     raise TypeError("Invalid value of letter")
 
