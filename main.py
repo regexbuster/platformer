@@ -24,8 +24,13 @@ class Player(pygame.sprite.Sprite):
 
         self.point_left = True
 
-    def update(self, screen):
-        self.move()
+        self.want_jump = 0
+        self.allowed_jumps = 1
+        self.jumps = 0
+        self.onGround = False
+
+    def update(self, screen, factory):
+        self.move(factory)
         self.draw(screen)
 
     def draw(self, screen: pygame.Surface):
@@ -54,7 +59,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 screen.blit(self.surface, player.rect)
 
-    def move(self):
+    def move(self, factory):
         """
         States:
             Moving L/R Grounded UnCrouched
@@ -64,16 +69,44 @@ class Player(pygame.sprite.Sprite):
             Jumping UnCrouched
             Jumping Crouched
         """
-        pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[pygame.K_UP]:
-            self.rect.move_ip(0, -5)
-        if pressed_keys[pygame.K_DOWN]:
-            self.rect.move_ip(0, 5)
-        if pressed_keys[pygame.K_LEFT]:
-            self.rect.move_ip(-5, 0)
-        if pressed_keys[pygame.K_RIGHT]:
-            self.rect.move_ip(5, 0)
-        pass
+        self.onGround = False
+        for floor in factory.get_contents():
+            if not self.onGround:
+                self.onGround = floor.colliderect(self.rect)
+                if self.onGround:
+                    val = cutils.is_colliding(floor, self, self.velocity)
+                    if val == 1:
+                        self.jumps = 0
+
+        pressed = pygame.key.get_pressed()
+
+        if pressed[pygame.K_a]:
+            self.point_left = True
+            if self.crouching:
+                self.velocity.x -= 0.05
+            else:
+                self.velocity.x -= 0.1
+        if pressed[pygame.K_d]:
+            self.point_left = False
+            if self.crouching:
+                self.velocity.x += 0.05
+            else:
+                self.velocity.x += 0.1
+
+        if not pressed[pygame.K_a] and not pressed[pygame.K_d] and self.onGround and not self.crouching:
+            self.velocity.x *= 0.8
+        else:
+            self.velocity.x *= 0.99
+
+        if not self.onGround:
+            self.velocity.y += 0.1
+
+        if self.jumps < self.allowed_jumps and pressed[pygame.K_SPACE] and not self.crouching:
+            self.velocity.y -= 5
+            self.jumps += 1
+            self.want_jump = False
+
+        self.rect = self.rect.move(self.velocity.x * (clock.get_time() / 10), self.velocity.y * (clock.get_time() / 10))
 
 
 class BoundaryFactory:
@@ -129,16 +162,10 @@ player = Player(300, 100, player_shape, pixel_size)
 factory = BoundaryFactory()
 
 bounds_color = utils.colors["Red"]
-factory.new_boundary(100, 400, 500, 50, bounds_color)
+factory.new_boundary(100, 400, 600, 50, bounds_color)
 factory.new_boundary(550, 100, 50, 260, bounds_color)
 factory.new_boundary(100,100, 50, 300, bounds_color)
 factory.new_boundary(300, 200, 100, 50, bounds_color)
-
-want_jump = 0
-allowed_jumps = 1
-jumps = 0
-
-crouching = False
 
 quack_ticker = 0
 
@@ -162,60 +189,22 @@ while not done:
 
     # --- Game logic should go here
 
-    onGround = False
-    for floor in factory.get_contents():
-        if not onGround:
-            onGround = floor.colliderect(player.rect)
-            #print(onGround)
-            if onGround:
-                val = cutils.is_colliding(floor, player, player.velocity)
-                if val == 1:
-                    jumps = 0
-
     pressed = pygame.key.get_pressed()
 
     if pressed[pygame.K_f]:
         quack_ticker += 1
-        if quack_ticker % (fps/4) == 0:
+        if quack_ticker % (fps / 4) == 0:
             pygame.mixer.music.load("quack.mp3")
             pygame.mixer.music.play()
     else:
         quack_ticker = 0
-
-    if pressed[pygame.K_a]:
-        player.point_left = True
-        if crouching:
-            player.rect.x -= 0.005
-        else:
-            player.velocity.x -= 0.1
-    if pressed[pygame.K_d]:
-        player.point_left = False
-        if crouching:
-            player.rect.x += 0.005
-        else:
-            player.velocity.x += 0.1
-
-    if not pressed[pygame.K_a] and not pressed[pygame.K_d] and onGround and not player.crouching:
-        player.velocity.x *= 0.8
-    else:
-        player.velocity.x *= 0.99
-
-    if not onGround:
-        player.velocity.y += 0.1
-
-    if jumps < allowed_jumps and pressed[pygame.K_SPACE] and not player.crouching:
-        player.velocity.y -= 5
-        jumps += 1
-        want_jump = False
-
-    player.rect = player.rect.move(player.velocity.x * (clock.get_time() / 10), player.velocity.y * (clock.get_time() / 10))
 
     # --- Screen-clearing code goes here
     screen.fill(utils.colors["Quarter_Gray"])
 
     # --- Drawing code should go here
 
-    player.update(screen)
+    player.update(screen, factory)
 
     floors, colors = factory.get_all()
 
