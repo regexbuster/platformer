@@ -84,13 +84,15 @@ class Player(pygame.sprite.Sprite):
         if pressed[pygame.K_a]:
             self.point_left = True
             if self.crouching:
-                self.velocity.x -= 0.05
+                pass
+                # self.velocity.x -= 0.05
             else:
                 self.velocity.x -= 0.1
         if pressed[pygame.K_d]:
             self.point_left = False
             if self.crouching:
-                self.velocity.x += 0.05
+                pass
+                # self.velocity.x += 0.05
             else:
                 self.velocity.x += 0.1
 

@@ -68,6 +68,9 @@ while not done:
             if event.key == pygame.K_f:
                 pygame.mixer.music.load("quack.mp3")
                 pygame.mixer.music.play()
+            if event.key == pygame.K_r:
+                player.rect.x = 300
+                player.rect.y = 100
 
     # --- Game logic should go here
 
