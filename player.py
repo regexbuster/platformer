@@ -65,7 +65,8 @@ class Player(pygame.sprite.Sprite):
 
         if not self.held_item is None:
             self.held_item.rect.center = self.rect.center
-            self.held_item.draw(screen, self.point_left)
+            self.held_item.point_left = self.point_left
+            self.held_item.draw(screen)
 
     def move(self, factory, clock):
         """
@@ -132,9 +133,12 @@ class Player(pygame.sprite.Sprite):
     def throw_item(self, factory):
         factory.add_item(self.held_item)
 
-        if self.point_left:
-            self.held_item.velocity.x -= (abs(self.velocity.x) + 5)
-        else:
-            self.held_item.velocity.x += (abs(self.velocity.x) + 5)
+        if not self.crouching:
+            # if not crouching we throw away
+            # if crouching we just let it fall to the ground
+            if self.point_left:
+                self.held_item.velocity.x -= (abs(self.velocity.x) + 5)
+            else:
+                self.held_item.velocity.x += (abs(self.velocity.x) + 5)
 
         self.held_item = None

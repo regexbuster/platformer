@@ -104,7 +104,7 @@ while not done:
 
     pressed = pygame.key.get_pressed()
 
-    if pressed[pygame.K_f]:
+    if pressed[pygame.K_x]:
         quack_ticker += 1
         if quack_ticker % (fps / 4) == 0:
             pygame.mixer.music.load("quack.mp3")
