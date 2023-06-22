@@ -2,6 +2,7 @@ import pygame
 import utils
 import collision_utils as cutils
 from player_sprites import player_default
+from item import Item
 
 
 class Player(pygame.sprite.Sprite):
@@ -16,7 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.height = len(self.shape) * pixel_size
 
         self.surface = pygame.Surface((self.width, self.height))
-        self.surface.set_colorkey([0,0,0])
+        self.surface.set_colorkey([0, 0, 0])
 
         self.rect = self.surface.get_rect(top=y, left=x)
 
@@ -29,6 +30,8 @@ class Player(pygame.sprite.Sprite):
         self.allowed_jumps = 1
         self.jumps = 0
         self.onGround = False
+
+        self.held_item = None
 
     def update(self, screen, factory, clock):
         self.move(factory, clock)
@@ -59,6 +62,11 @@ class Player(pygame.sprite.Sprite):
                 screen.blit(pygame.transform.flip(self.surface, True, False), self.rect)
             else:
                 screen.blit(self.surface, self.rect)
+
+        if not self.held_item is None:
+            self.held_item.rect.center = self.rect.center
+            self.held_item.point_left = self.point_left
+            self.held_item.draw(screen)
 
     def move(self, factory, clock):
         """
@@ -113,3 +121,24 @@ class Player(pygame.sprite.Sprite):
             self.want_jump = False
 
         self.rect = self.rect.move(self.velocity.x * (clock.get_time() / 10), self.velocity.y * (clock.get_time() / 10))
+
+    def grab_item(self, factory):
+        contents = factory.get_contents()
+        for i in range(len(contents)):
+            if contents[i].rect.colliderect(self.rect):
+                self.held_item = contents[i]
+                contents.pop(i)
+                break
+
+    def throw_item(self, factory):
+        factory.add_item(self.held_item)
+
+        if not self.crouching:
+            # if not crouching we throw away
+            # if crouching we just let it fall to the ground
+            if self.point_left:
+                self.held_item.velocity.x -= (abs(self.velocity.x) + 5)
+            else:
+                self.held_item.velocity.x += (abs(self.velocity.x) + 5)
+
+        self.held_item = None

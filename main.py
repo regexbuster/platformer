@@ -1,7 +1,10 @@
 import pygame
-
 import utils
+import item
+import item_sprites
+
 from player import Player
+
 
 class BoundaryFactory:
     def __init__(self):
@@ -13,7 +16,7 @@ class BoundaryFactory:
         self.colors.append(color)
 
     def new_boundary(self, x: int, y: int, width: int, height: int, color: pygame.Color) -> None:
-        self.contents.append(pygame.Rect(x,y,width,height))
+        self.contents.append(pygame.Rect(x, y, width, height))
         self.colors.append(color)
 
     def get_all(self):
@@ -24,6 +27,20 @@ class BoundaryFactory:
 
     def get_colors(self):
         return self.colors
+
+
+class ItemFactory:
+    def __init__(self):
+        self.contents = []
+
+    def add_item(self, item) -> None:
+        self.contents.append(item)
+
+    def new_item(self, shape, pixel_size, x, y) -> None:
+        self.contents.append(item.Item(shape, pixel_size, x, y))
+
+    def get_contents(self):
+        return self.contents
 
 
 pygame.init()
@@ -41,13 +58,19 @@ pixel_size = 5
 
 player = Player(300, 100, pixel_size)
 
-factory = BoundaryFactory()
+b_factory = BoundaryFactory()
+i_factory = ItemFactory()
 
 bounds_color = utils.colors["Red"]
-factory.new_boundary(100, 400, 600, 50, bounds_color)
-factory.new_boundary(550, 100, 50, 260, bounds_color)
-factory.new_boundary(100,100, 50, 300, bounds_color)
-factory.new_boundary(300, 250, 100, 50, bounds_color)
+b_factory.new_boundary(100, 400, 600, 50, bounds_color)
+b_factory.new_boundary(550, 100, 50, 260, bounds_color)
+b_factory.new_boundary(100, 100, 50, 300, bounds_color)
+b_factory.new_boundary(300, 250, 100, 50, bounds_color)
+
+shotgun = item.Item(item_sprites.shotgun, pixel_size, 300, 10)
+
+i_factory.add_item(shotgun)
+i_factory.new_item(item_sprites.shotgun, pixel_size, 400, 10)
 
 quack_ticker = 0
 
@@ -65,18 +88,23 @@ while not done:
                 want_jump = pygame.time.get_ticks()
             if event.key == pygame.K_s:
                 player.crouching = True
-            if event.key == pygame.K_f:
+            if event.key == pygame.K_x:
                 pygame.mixer.music.load("quack.mp3")
                 pygame.mixer.music.play()
             if event.key == pygame.K_r:
                 player.rect.x = 300
                 player.rect.y = 100
+            if event.key == pygame.K_f:
+                if player.held_item is None:
+                    player.grab_item(i_factory)
+                else:
+                    player.throw_item(i_factory)
 
     # --- Game logic should go here
 
     pressed = pygame.key.get_pressed()
 
-    if pressed[pygame.K_f]:
+    if pressed[pygame.K_x]:
         quack_ticker += 1
         if quack_ticker % (fps / 4) == 0:
             pygame.mixer.music.load("quack.mp3")
@@ -89,9 +117,14 @@ while not done:
 
     # --- Drawing code should go here
 
-    player.update(screen, factory, clock)
+    items = i_factory.get_contents()
 
-    floors, colors = factory.get_all()
+    for item in items:
+        item.update(screen, b_factory, clock)
+
+    player.update(screen, b_factory, clock)
+
+    floors, colors = b_factory.get_all()
 
     for i in range(len(floors)):
         pygame.draw.rect(screen, colors[i], floors[i])
