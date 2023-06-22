@@ -42,12 +42,6 @@ while not done:
     # --- Game logic should go here
 
     # --- Screen-clearing code goes here
-
-    # Here, we clear the screen to white. Don't put other drawing commands
-    # above this, or they will be erased with this command.
-
-    # If you want a background image, replace this clear with blit'ing the
-    # background image.
     screen.fill(utils.colors["Black"])
 
     # --- Drawing code should go here
@@ -56,9 +50,9 @@ while not done:
     blue_screen.fill(utils.colors["Blue"])
 
     if red:
-        screen.blit(red_screen, (0,0))
+        screen.blit(red_screen, (0, 0))
     else:
-        screen.blit(blue_screen, (0,0))
+        screen.blit(blue_screen, (0, 0))
 
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()

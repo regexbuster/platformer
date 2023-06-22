@@ -1,7 +1,10 @@
 import pygame
-
 import utils
+import item
+import item_sprites
+
 from player import Player
+
 
 class BoundaryFactory:
     def __init__(self):
@@ -13,7 +16,7 @@ class BoundaryFactory:
         self.colors.append(color)
 
     def new_boundary(self, x: int, y: int, width: int, height: int, color: pygame.Color) -> None:
-        self.contents.append(pygame.Rect(x,y,width,height))
+        self.contents.append(pygame.Rect(x, y, width, height))
         self.colors.append(color)
 
     def get_all(self):
@@ -46,8 +49,10 @@ factory = BoundaryFactory()
 bounds_color = utils.colors["Red"]
 factory.new_boundary(100, 400, 600, 50, bounds_color)
 factory.new_boundary(550, 100, 50, 260, bounds_color)
-factory.new_boundary(100,100, 50, 300, bounds_color)
+factory.new_boundary(100, 100, 50, 300, bounds_color)
 factory.new_boundary(300, 250, 100, 50, bounds_color)
+
+shotgun = item.Item(item_sprites.shotgun, pixel_size, 300, 10)
 
 quack_ticker = 0
 
@@ -88,6 +93,8 @@ while not done:
     screen.fill(utils.colors["Quarter_Gray"])
 
     # --- Drawing code should go here
+
+    shotgun.update(screen, factory, clock)
 
     player.update(screen, factory, clock)
 
