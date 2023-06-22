@@ -93,6 +93,11 @@ while not done:
             if event.key == pygame.K_r:
                 player.rect.x = 300
                 player.rect.y = 100
+            if event.key == pygame.K_f:
+                if player.held_item is None:
+                    player.grab_item(i_factory)
+                else:
+                    player.throw_item(i_factory)
 
     # --- Game logic should go here
 

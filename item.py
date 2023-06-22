@@ -35,12 +35,17 @@ class Item(pygame.sprite.Sprite):
         if not self.onGround:
             self.velocity.y += 0.2
 
+        self.velocity.x *= 0.95
+
         self.rect = self.rect.move(self.velocity.x * (clock.get_time() / 10), self.velocity.y * (clock.get_time() / 10))
 
-    def draw(self, screen: pygame.Surface):
+    def draw(self, screen: pygame.Surface, point_left=False):
         pixel_map, color_map = utils.pixels_to_rect_list(self.shape, self.pixel_size, 0, 0)
 
         for i in range(len(pixel_map)):
             pygame.draw.rect(self.surface, color_map[i], pixel_map[i])
 
-        screen.blit(self.surface, self.rect)
+        if point_left:
+            screen.blit(pygame.transform.flip(self.surface, True, False), self.rect)
+        else:
+            screen.blit(self.surface, self.rect)
