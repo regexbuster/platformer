@@ -29,6 +29,20 @@ class BoundaryFactory:
         return self.colors
 
 
+class ItemFactory:
+    def __init__(self):
+        self.contents = []
+
+    def add_item(self, item) -> None:
+        self.contents.append(item)
+
+    def new_item(self, shape, pixel_size, x, y) -> None:
+        self.contents.append(item.Item(shape, pixel_size, x, y))
+
+    def get_contents(self):
+        return self.contents
+
+
 pygame.init()
 
 # Set the width and height of the screen [width, height]
@@ -44,15 +58,18 @@ pixel_size = 5
 
 player = Player(300, 100, pixel_size)
 
-factory = BoundaryFactory()
+b_factory = BoundaryFactory()
+i_factory = ItemFactory()
 
 bounds_color = utils.colors["Red"]
-factory.new_boundary(100, 400, 600, 50, bounds_color)
-factory.new_boundary(550, 100, 50, 260, bounds_color)
-factory.new_boundary(100, 100, 50, 300, bounds_color)
-factory.new_boundary(300, 250, 100, 50, bounds_color)
+b_factory.new_boundary(100, 400, 600, 50, bounds_color)
+b_factory.new_boundary(550, 100, 50, 260, bounds_color)
+b_factory.new_boundary(100, 100, 50, 300, bounds_color)
+b_factory.new_boundary(300, 250, 100, 50, bounds_color)
 
 shotgun = item.Item(item_sprites.shotgun, pixel_size, 300, 10)
+
+i_factory.add_item(shotgun)
 
 quack_ticker = 0
 
@@ -94,11 +111,14 @@ while not done:
 
     # --- Drawing code should go here
 
-    shotgun.update(screen, factory, clock)
+    items = i_factory.get_contents()
 
-    player.update(screen, factory, clock)
+    for item in items:
+        item.update(screen, b_factory, clock)
 
-    floors, colors = factory.get_all()
+    player.update(screen, b_factory, clock)
+
+    floors, colors = b_factory.get_all()
 
     for i in range(len(floors)):
         pygame.draw.rect(screen, colors[i], floors[i])
