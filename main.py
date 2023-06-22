@@ -70,6 +70,7 @@ b_factory.new_boundary(300, 250, 100, 50, bounds_color)
 shotgun = item.Item(item_sprites.shotgun, pixel_size, 300, 10)
 
 i_factory.add_item(shotgun)
+i_factory.new_item(item_sprites.shotgun, pixel_size, 400, 10)
 
 quack_ticker = 0
 
@@ -87,7 +88,7 @@ while not done:
                 want_jump = pygame.time.get_ticks()
             if event.key == pygame.K_s:
                 player.crouching = True
-            if event.key == pygame.K_f:
+            if event.key == pygame.K_x:
                 pygame.mixer.music.load("quack.mp3")
                 pygame.mixer.music.play()
             if event.key == pygame.K_r:

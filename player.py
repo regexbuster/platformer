@@ -127,10 +127,14 @@ class Player(pygame.sprite.Sprite):
             if contents[i].rect.colliderect(self.rect):
                 self.held_item = contents[i]
                 contents.pop(i)
+                break
 
     def throw_item(self, factory):
         factory.add_item(self.held_item)
 
-        self.held_item.velocity.x += 5
+        if self.point_left:
+            self.held_item.velocity.x -= (abs(self.velocity.x) + 5)
+        else:
+            self.held_item.velocity.x += (abs(self.velocity.x) + 5)
 
         self.held_item = None
