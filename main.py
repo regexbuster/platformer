@@ -4,7 +4,6 @@ import item
 import item_sprites
 
 from player import Player
-from animation import Animation
 
 
 class BoundaryFactory:

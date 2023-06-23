@@ -1,8 +1,6 @@
 import pygame
-import utils
 import collision_utils as cutils
 from player_sprites import player_default
-from item import Item
 from animation import Animation
 
 
@@ -17,13 +15,16 @@ class Player(pygame.sprite.Sprite):
         # self.width = len(self.shape[0]) * pixel_size
         # self.height = len(self.shape) * pixel_size
 
-        self.animation = Animation("/player_idle", 3)
+        self.animation_idle = Animation("/player_idle", 3)
+        self.animation_walk = Animation("/player_walk", 2)
 
-        self.width = self.animation.get_size()[0]
-        self.height = self.animation.get_size()[1]
+        self.current_animation = self.animation_idle
 
-        self.surface = pygame.Surface((self.animation.get_size()))
-        self.surface.set_colorkey([0, 0, 0])
+        self.width = self.animation_idle.get_size()[0]
+        self.height = self.animation_idle.get_size()[1]
+
+        self.surface = pygame.Surface((self.animation_idle.get_size()))
+        # self.surface.set_colorkey([0, 0, 0])
 
         self.rect = self.surface.get_rect(top=y, left=x)
 
@@ -49,7 +50,7 @@ class Player(pygame.sprite.Sprite):
         # for i in range(len(pixel_map)):
         #     pygame.draw.rect(self.surface, color_map[i], pixel_map[i])
 
-        self.surface = self.animation.get_current_frame()
+        self.surface = self.current_animation.get_current_frame()
         self.surface = pygame.transform.scale(self.surface, self.surface.get_size())
 
         if self.crouching:
@@ -72,7 +73,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 screen.blit(self.surface, self.rect)
 
-        if not self.held_item is None:
+        if self.held_item is not None:
             self.held_item.rect.center = self.rect.center
             self.held_item.point_left = self.point_left
             self.held_item.draw(screen)
@@ -100,18 +101,22 @@ class Player(pygame.sprite.Sprite):
 
         if pressed[pygame.K_a]:
             self.point_left = True
+            self.current_animation = self.animation_walk
             if self.crouching:
                 pass
                 # self.velocity.x -= 0.05
             else:
                 self.velocity.x -= 0.1
-        if pressed[pygame.K_d]:
+        elif pressed[pygame.K_d]:
             self.point_left = False
+            self.current_animation = self.animation_walk
             if self.crouching:
                 pass
                 # self.velocity.x += 0.05
             else:
                 self.velocity.x += 0.1
+        else:
+            self.current_animation = self.animation_idle
 
         if not pressed[pygame.K_a] and not pressed[pygame.K_d] and self.onGround and not self.crouching:
             self.velocity.x *= 0.8

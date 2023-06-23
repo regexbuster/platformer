@@ -18,7 +18,7 @@ colors = {
     "Yellow": pygame.Color(255, 255, 0),
     "White": pygame.Color(255, 255, 255),
     "Orange": pygame.Color(255, 165, 0),
-    "Brown": pygame.Color(139,69,19),
+    "Brown": pygame.Color(139, 69, 19),
     "Background_Color_Key": pygame.Color("#BB00FF")
 }
 
