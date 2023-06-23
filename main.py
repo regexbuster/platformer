@@ -4,6 +4,7 @@ import item
 import item_sprites
 
 from player import Player
+from animation import Animation
 
 
 class BoundaryFactory:
@@ -73,9 +74,11 @@ i_factory.add_item(shotgun)
 i_factory.new_item(item_sprites.shotgun, pixel_size, 400, 10)
 
 quack_ticker = 0
+frame_ticker = 0
 
 fps = 60
 
+idle_animation = Animation("/player_idle", 3)
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -129,10 +132,14 @@ while not done:
     for i in range(len(floors)):
         pygame.draw.rect(screen, colors[i], floors[i])
 
+    frame = idle_animation.get_current_frame()
+    screen.blit(frame, (0, 0))
+
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
 
     # --- Limit to 60 frames per second
     clock.tick(fps)
+    frame_ticker += 1
 
 pygame.quit()
