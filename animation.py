@@ -1,6 +1,7 @@
 from glob import glob
 
 import pygame.image
+import utils
 
 
 class Animation:
@@ -9,15 +10,12 @@ class Animation:
         self.frame_delay = frame_delay
 
         self.images = []
+
         image_list = glob(f'./{images_dir}/*.gif')
-        print(f'./{images_dir}/*.gif')
-        print(image_list)
         for image in image_list:
             sur = pygame.image.load(image)
-            sur.set_colorkey(pygame.Color("#BB00FF"))
+            sur.set_colorkey(utils.colors["Background_Color_Key"])
             self.images.append(sur)
-
-        print(self.images)
 
         self.frames = len(self.images)
 
