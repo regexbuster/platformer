@@ -3,6 +3,7 @@ import utils
 import collision_utils as cutils
 from player_sprites import player_default
 from item import Item
+from animation import Animation
 
 
 class Player(pygame.sprite.Sprite):
@@ -13,10 +14,15 @@ class Player(pygame.sprite.Sprite):
         self.shape = player_default
         self.pixel_size = pixel_size
 
-        self.width = len(self.shape[0]) * pixel_size
-        self.height = len(self.shape) * pixel_size
+        # self.width = len(self.shape[0]) * pixel_size
+        # self.height = len(self.shape) * pixel_size
 
-        self.surface = pygame.Surface((self.width, self.height))
+        self.animation = Animation("/player_idle", 3)
+
+        self.width = self.animation.get_size()[0]
+        self.height = self.animation.get_size()[1]
+
+        self.surface = pygame.Surface((self.animation.get_size()))
         self.surface.set_colorkey([0, 0, 0])
 
         self.rect = self.surface.get_rect(top=y, left=x)
@@ -38,10 +44,13 @@ class Player(pygame.sprite.Sprite):
         self.draw(screen)
 
     def draw(self, screen: pygame.Surface):
-        pixel_map, color_map = utils.pixels_to_rect_list(self.shape, self.pixel_size, 0, 0)
+        # pixel_map, color_map = utils.pixels_to_rect_list(self.shape, self.pixel_size, 0, 0)
+        #
+        # for i in range(len(pixel_map)):
+        #     pygame.draw.rect(self.surface, color_map[i], pixel_map[i])
 
-        for i in range(len(pixel_map)):
-            pygame.draw.rect(self.surface, color_map[i], pixel_map[i])
+        self.surface = self.animation.get_current_frame()
+        self.surface = pygame.transform.scale(self.surface, self.surface.get_size())
 
         if self.crouching:
             self.rect.height = self.height / 2

@@ -4,6 +4,7 @@ import item
 import item_sprites
 
 from player import Player
+from animation import Animation
 
 
 class BoundaryFactory:
@@ -73,6 +74,7 @@ i_factory.add_item(shotgun)
 i_factory.new_item(item_sprites.shotgun, pixel_size, 400, 10)
 
 quack_ticker = 0
+frame_ticker = 0
 
 fps = 60
 
@@ -134,5 +136,6 @@ while not done:
 
     # --- Limit to 60 frames per second
     clock.tick(fps)
+    frame_ticker += 1
 
 pygame.quit()
